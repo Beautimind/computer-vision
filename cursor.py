@@ -11,16 +11,16 @@ negnum=10;
 
 for i in range(1,posnum+1):
     filename=dir+'pos_'+str(i)+'.jpg'
-    pos.append(cv.imread(filename,0));
+    pos.append(cv.imread(filename));
 
 for i in range(1,posnum+1):
     filename=dir+'neg_'+str(i)+'.jpg'
-    neg.append(cv.imread(filename,0));
+    neg.append(cv.imread(filename));
 
-cursor=cv.imread(dir+'cursorf.jpg',0)
+cursor=cv.imread(dir+'cursor3.jpg')
 # cursor=cv.resize(cursor,(0,0),2,2)
-_,cursor=cv.threshold(cursor,100,255,cv.THRESH_BINARY)
-cursor=cv.Sobel(cursor,cv.CV_64F,1,1)
+# _,cursor=cv.threshold(cursor,100,255,cv.THRESH_BINARY)
+# cursor=cv.Sobel(cursor,cv.CV_64F,1,1)
 # _,cursor=cv.threshold(cursor,125,255,cv.THRESH_BINARY);
 cv.imshow('result',cursor);
 cv.waitKey();
