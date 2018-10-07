@@ -11,17 +11,31 @@ negnum=10;
 
 for i in range(1,posnum+1):
     filename=dir+'pos_'+str(i)+'.jpg'
-    pos.append(cv.imread(filename));
+    pos.append(cv.imread(filename,0));
 
 for i in range(1,posnum+1):
     filename=dir+'neg_'+str(i)+'.jpg'
-    neg.append(cv.imread(filename));
+    neg.append(cv.imread(filename,0));
 
-cursor=cv.imread(dir+'cursor3.jpg')
+cursor=cv.imread(dir+'cursor3.jpg',0)
+_,cursor=cv.threshold(cursor,170,255,cv.THRESH_TOZERO)
+_,bg=cv.threshold(cursor,170,125, cv.THRESH_BINARY_INV)
+# cv.imshow('result',bg);
+# cv.waitKey();
+# cursor=cursor+bg
+cursor=cv.Laplacian(cursor,cv.CV_64F,ksize=5)
+_, cursor = cv.threshold(cursor, 150, 255, cv.THRESH_BINARY)
+cursor=cursor.astype(np.uint8)
+cv.imshow('result',cursor)
+# cv.waitKey();
+# _,cursor = cv.threshold(cursor, 150, 255, cv.THRESH_BINARY)
 # cursor=cv.resize(cursor,(0,0),2,2)
 # _,cursor=cv.threshold(cursor,100,255,cv.THRESH_BINARY)
 # cursor=cv.Sobel(cursor,cv.CV_64F,1,1)
 # _,cursor=cv.threshold(cursor,125,255,cv.THRESH_BINARY);
+# cursor=np.absolute(cursor)
+# cursor=cursor/np.max(cursor)*255
+# cursor=cursor.astype(np.uint8)
 cv.imshow('result',cursor);
 cv.waitKey();
 # print(len(cursor))
@@ -30,12 +44,22 @@ for i in pos:
     # _,temp=cv.threshold(i,200,255,cv.THRESH_BINARY)
     # cv.imshow('binary',temp);
     # cv.waitKey();
-    result=cv.matchTemplate(i, cursor,method=cv.TM_CCOEFF_NORMED)
+    _,t=cv.threshold(i,150,255,cv.THRESH_TOZERO)
+    # t=cv.resize(i,(i.shape[1]*2,i.shape[0]*2))
+    # t=cv.GaussianBlur(t,(3,3),1)
+    # t = cv.resize(t, (int(i.shape[1] / 2), int(i.shape[0] / 2)))
+    t=cv.Laplacian(t,cv.CV_64F,ksize=5)
+    _, t = cv.threshold(t, 200, 255, cv.THRESH_BINARY)
+    t=t.astype(np.uint8)
+    # cv.imshow('s', t);
+    # cv.waitKey()
+
+    result=cv.matchTemplate(t, cursor,method=cv.TM_CCOEFF_NORMED)
     # cv.imshow('result',result)
     # cv.waitKey()
     minVal, maxVal, minLoc, maxLoc=cv.minMaxLoc(result);
     print(maxVal,maxLoc)
-    cv.rectangle(i,maxLoc,(maxLoc[0]+len(cursor[0]),maxLoc[1]+len(cursor)),(0,0,255));
+    cv.rectangle(i,maxLoc,(maxLoc[0]+len(cursor[0]),maxLoc[1]+len(cursor)),255);
     cv.imshow(str(maxVal),i);
     cv.waitKey()
 for i in neg:
