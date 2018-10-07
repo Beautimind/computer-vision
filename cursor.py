@@ -9,6 +9,22 @@ neg=list();
 posnum=15
 negnum=10;
 
+def findcursor(i,cursor):
+    _, t = cv.threshold(i, 150, 255, cv.THRESH_TOZERO)
+    # t=cv.resize(i,(i.shape[1]*2,i.shape[0]*2))
+    # t=cv.GaussianBlur(t,(3,3),1)
+    # t = cv.resize(t, (int(i.shape[1] / 2), int(i.shape[0] / 2)))
+    t = cv.Laplacian(t, cv.CV_64F, ksize=5)
+    _, t = cv.threshold(t, 200, 255, cv.THRESH_BINARY)
+    t = t.astype(np.uint8)
+    result = cv.matchTemplate(t, cursor, method=cv.TM_SQDIFF)
+    # cv.imshow('result',result)
+    # cv.waitKey()
+    minVal, maxVal, minLoc, maxLoc = cv.minMaxLoc(result);
+    return minVal,minLoc
+
+t=dir+'pos_'+str(5)+'.jpg'
+
 for i in range(1,posnum+1):
     filename=dir+'pos_'+str(i)+'.jpg'
     pos.append(cv.imread(filename,0));
@@ -20,55 +36,61 @@ for i in range(1,posnum+1):
 cursor=cv.imread(dir+'cursor3.jpg',0)
 _,cursor=cv.threshold(cursor,170,255,cv.THRESH_TOZERO)
 _,bg=cv.threshold(cursor,170,125, cv.THRESH_BINARY_INV)
-# cv.imshow('result',bg);
-# cv.waitKey();
-# cursor=cursor+bg
 cursor=cv.Laplacian(cursor,cv.CV_64F,ksize=5)
 _, cursor = cv.threshold(cursor, 150, 255, cv.THRESH_BINARY)
 cursor=cursor.astype(np.uint8)
-cv.imshow('result',cursor)
-# cv.waitKey();
-# _,cursor = cv.threshold(cursor, 150, 255, cv.THRESH_BINARY)
-# cursor=cv.resize(cursor,(0,0),2,2)
-# _,cursor=cv.threshold(cursor,100,255,cv.THRESH_BINARY)
-# cursor=cv.Sobel(cursor,cv.CV_64F,1,1)
-# _,cursor=cv.threshold(cursor,125,255,cv.THRESH_BINARY);
-# cursor=np.absolute(cursor)
-# cursor=cursor/np.max(cursor)*255
-# cursor=cursor.astype(np.uint8)
+# cv.imshow('result',cursor)
+
+# i=pos[10]
+# maxVal,maxLoc=findcursor(i,cursor)
+# if maxVal<3100000:
+#     cv.rectangle(i,maxLoc,(maxLoc[0]+len(cursor[0]),maxLoc[1]+len(cursor)),255,thickness=2);
+# cv.imwrite("pos11result"+".jpg",i)
+# cv.imshow(str(maxVal),i);
+# cv.waitKey()
+
+
 cv.imshow('result',cursor);
 cv.waitKey();
 # print(len(cursor))
 # print(len(cursor[0]))
-for i in pos:
-    # _,temp=cv.threshold(i,200,255,cv.THRESH_BINARY)
-    # cv.imshow('binary',temp);
-    # cv.waitKey();
-    _,t=cv.threshold(i,150,255,cv.THRESH_TOZERO)
-    # t=cv.resize(i,(i.shape[1]*2,i.shape[0]*2))
-    # t=cv.GaussianBlur(t,(3,3),1)
-    # t = cv.resize(t, (int(i.shape[1] / 2), int(i.shape[0] / 2)))
-    t=cv.Laplacian(t,cv.CV_64F,ksize=5)
-    _, t = cv.threshold(t, 200, 255, cv.THRESH_BINARY)
-    t=t.astype(np.uint8)
-    # cv.imshow('s', t);
-    # cv.waitKey()
-
-    result=cv.matchTemplate(t, cursor,method=cv.TM_CCOEFF_NORMED)
+# for k in range(0,15):
+#     # # cv.imshow('i',i)
+#     # # cv.waitKey()
+#     # # _,temp=cv.threshold(i,200,255,cv.THRESH_BINARY)
+#     # # cv.imshow('binary',temp);
+#     # # cv.waitKey();
+#     # _,t=cv.threshold(i,150,255,cv.THRESH_TOZERO)
+#     # # t=cv.resize(i,(i.shape[1]*2,i.shape[0]*2))
+#     # # t=cv.GaussianBlur(t,(3,3),1)
+#     # # t = cv.resize(t, (int(i.shape[1] / 2), int(i.shape[0] / 2)))
+#     # t=cv.Laplacian(t,cv.CV_64F,ksize=5)
+#     # _, t = cv.threshold(t, 200, 255, cv.THRESH_BINARY)
+#     # t=t.astype(np.uint8)
+#     # # cv.imshow('s', t);
+#     # # cv.waitKey()
+#     #
+#     # result=cv.matchTemplate(t, cursor,method=cv.TM_CCOEFF_NORMED)
+#     # # cv.imshow('result',result)
+#     # # cv.waitKey()
+#     # minVal, maxVal, minLoc, maxLoc=cv.minMaxLoc(result);
+#     i=pos[k]
+#     maxVal,maxLoc=findcursor(i,cursor)
+#     print(maxVal,maxLoc)
+#     if maxVal<3200000:
+#         cv.rectangle(i,maxLoc,(maxLoc[0]+len(cursor[0]),maxLoc[1]+len(cursor)),255,thickness=2);
+#     cv.imwrite("pos"+str(k+1)+"result"+".jpg",i)
+#     cv.imshow(str(maxVal),i);
+#     cv.waitKey()
+for k in range(0,negnum):
+    i=neg[k];
+    maxVal, maxLoc = findcursor(i, cursor)
+    # result = cv.matchTemplate(i, cursor, method=cv.TM_SQDIFF_NORMED)                                                                                                                                                                                                                 
     # cv.imshow('result',result)
     # cv.waitKey()
-    minVal, maxVal, minLoc, maxLoc=cv.minMaxLoc(result);
-    print(maxVal,maxLoc)
-    cv.rectangle(i,maxLoc,(maxLoc[0]+len(cursor[0]),maxLoc[1]+len(cursor)),255);
-    cv.imshow(str(maxVal),i);
-    cv.waitKey()
-for i in neg:
-    result = cv.matchTemplate(i, cursor, method=cv.TM_CCOEFF_NORMED)
-    # cv.imshow('result',result)
-    # cv.waitKey()
-    minVal, maxVal, minLoc, maxLoc = cv.minMaxLoc(result);
     print(maxVal, maxLoc)
-    cv.rectangle(i, maxLoc, (maxLoc[0] + len(cursor[0]), maxLoc[1] + len(cursor)), (0, 0, 255));
+    if maxVal<3200000:
+        cv.rectangle(i, maxLoc, (maxLoc[0] + len(cursor[0]), maxLoc[1] + len(cursor)), (0, 0, 255),thickness=2);
     cv.imshow(str(maxVal), i);
     cv.waitKey()
 # cv.imshow('cursor',cursor)

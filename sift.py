@@ -151,13 +151,13 @@ for i in range(0,4):
     for j in range(0,5):
         kernel=genkernel(sigmas[i][j],7)
         octaves[i].append(gaussian(imgs[i],kernel));
+        # cv.imwrite('blurred' + str(i) + '-' + str(j) + '.jpg', (octaves[i][j] * 255).astype(np.uint8));
         # print(octaves[i][-1][100][100])
         # print(kernel)
 
 # Show the blurring result
 for i in octaves:
     for j in i:
-        cv.imwrite('blurred' + str(i) + '-' + str(j) + '.jpg', j);
         cv.imshow('blurred', j)
         cv.waitKey()
 
@@ -173,7 +173,8 @@ for i in range(0,4):
         max=np.max(DOGs[-1][-1]);
         min=np.min(DOGs[-1][-1]);
         tostore=(DOGs[-1][-1]-min)/(max-min)
-        cv.imwrite('DOG'+str(i)+'-'+str(j)+'.jpg',DOGs[-1][-1])
+        tostore=(DOGs[-1][-1]*255).astype(np.uint8)
+        # cv.imwrite('DOG'+str(i)+'-'+str(j)+'.jpg',(DOGs[-1][-1]*255).astype(np.uint8))
         cv.imshow('DOG',tostore);
         cv.waitKey();
 #
@@ -186,25 +187,29 @@ for i in range(0,4):
         keypoints[-1]=keypoints[-1].union(findkeypoint(DOGs[i][j-1],DOGs[i][j],DOGs[i][j+1]))
     print(len(keypoints[-1]))
 
+key=list()
 for i in range(0,4):
     for p in keypoints[i]:
-        imgs[i][p[0]][p[1]]=1.0;
+        key.append((p[0]*(i+1),p[1]*(i+1)))
 
-for img in imgs:
-    cv.imshow('keypoints',img)
-    cv.waitKey()
-
-cv.imshow('origin',img);
-# cv.waitKey(0);
-g=gaussian(img,kernel);
-# a=downsample(img)
-cv.imshow('blurred',g);
+a=sorted(key,key=lambda x: x[1])
+print(a[0:6])
+for i in key:
+    imgs[0][i[0]][i[1]]=1.0;
+cv.imshow('keypoints',img[0]);
 cv.waitKey()
-
-for i in range(1,5):
-    sigmas[0,i]=root2*sigmas[0][i-1];
-for j in range(1,4):
-    sigmas[j,:]=sigmas[j-1,:]*2;
+cv.imwrite("keypoints.jpg",(imgs[0]*255).astype(np.uint8))
+# cv.imshow('origin',img);
+# # cv.waitKey(0);
+# g=gaussian(img,kernel);
+# # a=downsample(img)
+# cv.imshow('blurred',g);
+# cv.waitKey()
+#
+# for i in range(1,5):
+#     sigmas[0,i]=root2*sigmas[0][i-1];
+# for j in range(1,4):
+#     sigmas[j,:]=sigmas[j-1,:]*2;
 
 
 
